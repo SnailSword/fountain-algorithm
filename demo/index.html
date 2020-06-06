@@ -31,22 +31,27 @@
 </head>
 <body>
     <canvas width="120" height="100" id="canvas"></canvas>
-    <p>上面的canvas里面是预先放置的矩形</p>
+    <p>上面的canvas里面是预先放置的障碍矩形</p>
     <p>拖动右侧的备选矩形到上面的canvas中</p>
     <p>就会以距离drop的点最近的可以作为备选矩形左上角的点为左上角放置矩形</p>
+    <br />
+    <p>（canvas内边缘大概100px范围内为缓冲区</p>
+    <p>预先放置的障碍矩形不会在缓冲区中</p>
+    <p>缓冲区里有矩形的话后续计算会有偏差</p>
+    <p>刷新页面可以重置）</p>
 
     <div class="alternative-area-container">
         <p>备选矩形:</p>
         <div id="alternative-area"></div>
     </div>
     <script>
-        const minX = 30;
+        const minX = 20;
         const maxX = 90;
-        const minY = 30;
-        const maxY = 80;
+        const minY = 20;
+        const maxY = 90;
         const canvasHeight = 100;
         const canvasWidth = 120;
-        const E = 35;
+        const E = 20;
         const scale = 5;
         let obstacleList;
         let m;
@@ -59,8 +64,8 @@
         }
         function getRandomRect() {
             return {
-                x: minX + Math.floor(Math.random() * (maxX - E)),
-                y: minY + Math.floor(Math.random() * (maxY - E)),
+                x: minX + Math.floor(Math.random() * (maxX - minX - E)),
+                y: minY + Math.floor(Math.random() * (maxY - minY - E)),
                 width: 3 + Math.floor(Math.random() * E),
                 height: 4 + Math.floor(Math.random() * E)
             };
@@ -69,7 +74,6 @@
         let context = c.getContext('2d');
 
         function drawObstacle() {
-            // context.clearRect(0, 0, canvasWidth, canvasWidth);
             context.fillStyle = '#f7f7f7';
             context.fillRect(0, 0, canvasWidth, canvasWidth);
             for (let i = 0; i < obstacleList.length; i++) {
@@ -160,12 +164,13 @@
             console.log('size', attr.width, attr.height);
             if (p) {
                 const [px, py] = p;
+                m.addObstacle({...attr, x: px, y: py});
                 drawOneRect({
                     x: px, y: py,
                     width: attr.width,
                     height: attr.height,
                     color: attr.color});
-                    console.log(result, px, py);
+                    console.log('result', px, py);
             }
             console.log('miss');
         }, false);

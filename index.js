@@ -54,7 +54,7 @@ class Fountain {
     }
 
     _placePoint(point, size) {
-        this._setObstacleBufferBasedOnTargetSize(size);
+        this._setObstacleBufferBasedOnTargetSize();
         let {width, height} = size;
         let {x, y} = point;
         let maxR = Math.min(this.obstacleHeight + height, this.obstacleWidth + width) / 2;
@@ -83,8 +83,8 @@ class Fountain {
     }
 
     addObstacle({width, height, x, y}) {
-        for (let i = rect.x - width; i < rect.x + rect.width; i++) {
-            for (let j = rect.y - height; j < rect.y + rect.height; j++) {
+        for (let i = x - this.curWidth; i < x + width; i++) {
+            for (let j = y - this.curHight; j < y + height; j++) {
                 if (!this.obstacleBuffer[i - this.CoordMinX]) {
                     this.obstacleBuffer[i - this.CoordMinX] = [];
                 }
@@ -101,16 +101,9 @@ class Fountain {
         return this.obstacleWidth + this.maxTatgetSize;
     }
 
-    _setObstacleBufferBasedOnTargetSize({width, height}) {
+    _setObstacleBufferBasedOnTargetSize() {
         for (let rect of this.obstacleList) {
-            for (let i = rect.x - width; i < rect.x + rect.width; i++) {
-                for (let j = rect.y - height; j < rect.y + rect.height; j++) {
-                    if (!this.obstacleBuffer[i - this.CoordMinX]) {
-                        this.obstacleBuffer[i - this.CoordMinX] = [];
-                    }
-                    this.obstacleBuffer[i - this.CoordMinX][j - this.CoordMinY] = 1;
-                }
-            }
+            this.addObstacle(rect);
         }
     }
 
