@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fountain Algo Demo</title>
+    <script src="../index.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        #canvas {
+            width: 600px;
+            image-rendering: pixelated;
+        }
+        #alternative-area {
+            color: #000;
+            text-align: center;
+        }
+        .alternative-area-container {
+            position: fixed;
+            right: 0;
+            top: 0;
+        }
+        #alternative-area div {
+            margin: 10px;
+            cursor: move;
+        }
+    </style>
+</head>
+<body>
+    <canvas width="120" height="100" id="canvas"></canvas>
+    <p>上面的canvas里面是预先放置的矩形</p>
+    <p>拖动右侧的备选矩形到上面的canvas中</p>
+    <p>就会以距离drop的点最近的可以作为备选矩形左上角的点为左上角放置矩形</p>
+
+    <div class="alternative-area-container">
+        <p>备选矩形:</p>
+        <div id="alternative-area"></div>
+    </div>
+    <script>
+        const minX = 30;
+        const maxX = 90;
+        const minY = 30;
+        const maxY = 80;
+        const canvasHeight = 100;
+        const canvasWidth = 120;
+        const E = 35;
+        const scale = 5;
+        let obstacleList;
+        let m;
+        function generateRandomRects(counts = 5) {
+            obstacleList = [];
+            for (let i = 0; i < counts; i++) {
+                obstacleList.push(getRandomRect());
+            }
+            m = new Fountain(obstacleList, E);
+        }
+        function getRandomRect() {
+            return {
+                x: minX + Math.floor(Math.random() * (maxX - E)),
+                y: minY + Math.floor(Math.random() * (maxY - E)),
+                width: 3 + Math.floor(Math.random() * E),
+                height: 4 + Math.floor(Math.random() * E)
+            };
+        }
+        let c = document.getElementById('canvas');
+        let context = c.getContext('2d');
+
+        function drawObstacle() {
+            // context.clearRect(0, 0, canvasWidth, canvasWidth);
+            context.fillStyle = '#f7f7f7';
+            context.fillRect(0, 0, canvasWidth, canvasWidth);
+            for (let i = 0; i < obstacleList.length; i++) {
+                drawOneRect(obstacleList[i]);
+            }
+        }
+
+        function drawOneRect({x, y, width, height, color}) {
+            let r = Math.floor(Math.random() * 255);
+            let g = Math.floor(Math.random() * 255);
+            let b = Math.floor(Math.random() * 255);
+            context.beginPath();
+            context.fillStyle = color || `rgb(${r},${g},${b})`;
+            context.fillRect(x, y, width, height);
+        }
+
+        function generateAndDrawRandomRect() {
+            generateRandomRects();
+            drawObstacle();
+        }
+
+        generateAndDrawRandomRect();
+
+        const alternativeRects = [
+            {
+                name: '海绵宝宝',
+                width: 20,
+                height: 30,
+                color: '#fffe26'
+            },
+            {
+                name: '派大星',
+                width: 15,
+                height: 35,
+                color: '#ffaed7'
+            },
+            {
+                name: '章鱼哥',
+                width: 10,
+                height: 30,
+                color: '#a6d0bd'
+            },
+            {
+                name: '蟹老板',
+                width: 35,
+                height: 15,
+                color: '#ee2643'
+            },
+            {
+                name: '痞老板',
+                width: 3,
+                height: 15,
+                color: '#7db2ae'
+            }
+        ];
+        function generateAlternativeDiv() {
+            let container = document.getElementById('alternative-area');
+            let res = ''
+            for (let candidate of alternativeRects) {
+                res += `<div draggable="true" 
+                    title="${candidate.name}"
+                    style="background-color:${candidate.color};width:${candidate.width * scale}px;height:${candidate.height * scale}px">
+                    ${candidate.name}</div>`;
+            }
+            container.innerHTML = res;
+        }
+        generateAlternativeDiv();
+
+        function getAttr(name) {
+            for (let candidate of alternativeRects) {
+                if (candidate.name === name) {
+                    return candidate;
+                }
+            }
+        };
+
+
+        document.addEventListener("dragend", function(event) {
+            let attr = getAttr(event.target.title);
+            if (event.x > canvasWidth * scale || event.y > canvasHeight * scale) {
+                return;
+            }
+            let x = Math.floor(event.x / scale);
+            let y = Math.floor(event.y / scale);
+            let p = m.place({x, y}, attr);
+            console.log('obstacleList', obstacleList);
+            console.log('target point', x, y);
+            console.log('size', attr.width, attr.height);
+            if (p) {
+                const [px, py] = p;
+                drawOneRect({
+                    x: px, y: py,
+                    width: attr.width,
+                    height: attr.height,
+                    color: attr.color});
+                    console.log(result, px, py);
+            }
+            console.log('miss');
+        }, false);
+    </script>
+</body>
+</html>
