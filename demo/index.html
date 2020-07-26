@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fountain Algo Demo</title>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-173601635-1"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-173601635-1');
+    </script>
+
     <script src="../index.js"></script>
     <style>
         * {
@@ -45,6 +55,21 @@
         <div id="alternative-area"></div>
     </div>
     <script>
+        gtag('event', 'aaa', {
+            'event_category' : 'bbb',
+            'event_label' : 'ccc'
+        });
+        gtag('event', 'timing_complete', {
+            'name' : 'load11',
+            'value' : Math.random() * 100,
+            'event_category' : 'JS Dependdsaencies'
+        });
+
+        gtag('event', 'screen_view', {
+            'app_name': 'myAppName',
+            'screen_name' : 'Home'
+        });
+
         const minX = 20;
         const maxX = 90;
         const minY = 20;
